@@ -20,15 +20,15 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install scrapy frontmatter  # Required by awesome_scraper.py
+          pip install scrapy frontmatter lxml  # Matches awesome_scraper.py requirements
 
       - name: Run scraper to update data
-        run: python scraper/awesome_scraper.py  # Updated path to scraper/
+        run: python scraper/awesome_scraper.py  # Points to scraper/ folder
 
       - name: Commit and push updated data
         run: |
           git config user.name "Automated Scraper"
           git config user.email "actions@github.com"
-          git add extension/data/  # Where scraper saves output (e.g., awesome.txt, sites.json)
+          git add extension/data/  # Where scraper outputs (e.g., awesome.txt, sites.json)
           git commit -m "Auto-update scraped content: $(date -u)" || exit 0
           git push
