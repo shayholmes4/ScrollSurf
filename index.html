@@ -10,8 +10,9 @@
         .content-list { max-width: 800px; margin: 0 auto; padding: 10px; }
         .item { background: white; margin: 10px 0; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); opacity: 0; animation: fadeIn 0.5s ease-in forwards; }
         .item a { color: #007bff; text-decoration: none; font-weight: bold; }
-        .item a:hover { text-decoration: underline; Geological Modeling Resources, https://github.com/softwareunderground/awesome-open-geoscience }
+        .item a:hover { text-decoration: underline; }
         .loading { text-align: center; padding: 20px; display: none; }
+        .error { text-align: center; color: red; padding: 20px; }
         button { display: block; margin: 10px auto; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
         button:hover { background: #0056b3; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -20,9 +21,10 @@
 </head>
 <body>
     <h1>ScrollSurf: Infinite Random Web Surfing</h1>
-    <button onclick="window.open(allSites[Math.floor(Math.random() * allSites.length)].url, '_blank')">Surf Now!</button>
+    <button onclick="if (allSites.length) window.open(allSites[Math.floor(Math.random() * allSites.length)].url, '_blank')">Surf Now!</button>
     <div class="content-list" id="content-list"></div>
     <div class="loading" id="loading">Loading more...</div>
+    <div class="error" id="error" style="display: none;"></div>
 
     <script>
         const DATA_URL = 'https://raw.githubusercontent.com/shayholmes4/ScrollSurf/main/extension/data/awesome.txt';
@@ -31,17 +33,23 @@
         const BATCH_SIZE = 10;
 
         async function loadData() {
+            const errorDiv = document.getElementById('error');
             try {
                 const response = await fetch(DATA_URL);
-                if (!response.ok) throw new Error('Failed to fetch data');
+                if (!response.ok) throw new Error(`Failed to fetch data: ${response.status}`);
                 const text = await response.text();
                 allSites = text.split('\n').filter(line => line.trim()).map(line => {
-                    const [title, url] = line.split(',').map(s => s.trim());
+                    const parts = line.split(',').map(s => s.trim());
+                    if (parts.length < 2) return null; // Skip invalid lines
+                    const [title, url] = parts;
                     return { title, url };
-                });
+                }).filter(item => item); // Remove invalid entries
+                if (!allSites.length) throw new Error('No valid data found in awesome.txt');
                 shuffleArray(allSites);
                 loadMore();
             } catch (error) {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = `Error: ${error.message}`;
                 console.error('Error loading data:', error);
             }
         }
