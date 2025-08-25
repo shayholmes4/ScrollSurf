@@ -10,25 +10,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history
+          ref: master  # Explicitly use master branch
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install scrapy frontmatter lxml  # Matches awesome_scraper.py requirements
+          pip install scrapy frontmatter lxml
+
+      - name: Debug file structure before scrape
+        run: |
+          ls -R
+          echo "Checking awesome.txt:"
+          cat extension/data/awesome.txt || echo "File not found or empty"
 
       - name: Run scraper to update data
-        run: python scraper/awesome_scraper.py  # Points to scraper/ folder
+        run: python scraper/awesome_scraper.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # For API rate limits
+
+      - name: Debug file structure after scrape
+        run: |
+          ls -R
+          echo "Checking awesome.txt after scrape:"
+          cat extension/data/awesome.txt || echo "File not found or empty"
 
       - name: Commit and push updated data
         run: |
           git config user.name "Automated Scraper"
           git config user.email "actions@github.com"
-          git add extension/data/awesome.txt # Where scraper outputs (e.g., awesome.txt, sites.json)
-          git commit -m "Auto-update scraped content: $(date -u)" || exit 0
+          git add extension/data/ extension/data_summary.json
+          git commit -m "Auto-update scraped content: $(date -u)" || echo "No changes to commit"
           git push
