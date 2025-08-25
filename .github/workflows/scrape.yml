@@ -41,4 +41,3 @@ name: Auto-Scrape Awesome Lists
                git add extension/data/awesome.txt || echo "No awesome.txt to add"
                git commit -m "Auto-update scraped content: $(date -u)" || echo "No changes to commit"
                git push
-     ```
