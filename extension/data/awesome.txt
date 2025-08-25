@@ -1,3 +1,1 @@
-Python Resources, https://github.com/vinta/awesome-python
-AI Tools, https://github.com/mlabonne/awesome-ai
-Web Development, https://github.com/markodenic/web-development-resources
+
