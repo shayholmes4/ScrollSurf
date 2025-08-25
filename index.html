@@ -27,7 +27,7 @@
     <div class="error" id="error" style="display: none;"></div>
 
     <script>
-        const DATA_URL = 'https://raw.githubusercontent.com/shayholmes4/ScrollSurf/main/extension/data/awesome.txt';
+        const DATA_URL = 'https://raw.githubusercontent.com/shayholmes4/ScrollSurf/master/extension/data/awesome.txt';
         let allSites = [];
         let currentIndex = 0;
         const BATCH_SIZE = 10;
@@ -36,14 +36,23 @@
             const errorDiv = document.getElementById('error');
             try {
                 const response = await fetch(DATA_URL);
-                if (!response.ok) throw new Error(`Failed to fetch data: ${response.status}`);
+                if (!response.ok) throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
                 const text = await response.text();
                 allSites = text.split('\n').filter(line => line.trim()).map(line => {
                     const parts = line.split(',').map(s => s.trim());
-                    if (parts.length < 2) return null; // Skip invalid lines
+                    if (parts.length < 2) {
+                        console.warn(`Skipping invalid line: ${line}`);
+                        return null;
+                    }
                     const [title, url] = parts;
-                    return { title, url };
-                }).filter(item => item); // Remove invalid entries
+                    try {
+                        new URL(url); // Validate URL
+                        return { title, url };
+                    } catch {
+                        console.warn(`Skipping invalid URL: ${url}`);
+                        return null;
+                    }
+                }).filter(item => item);
                 if (!allSites.length) throw new Error('No valid data found in awesome.txt');
                 shuffleArray(allSites);
                 loadMore();
