@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!-- Mobile responsive -->
+    <title>ScrollSurf - Random Web Discovery</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
+        h1 { text-align: center; padding: 20px; background: #007bff; color: white; margin: 0; }
+        .content-list { max-width: 800px; margin: 0 auto; padding: 10px; }
+        .item { background: white; margin: 10px 0; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .item a { color: #007bff; text-decoration: none; font-weight: bold; }
+        .item a:hover { text-decoration: underline; }
+        .loading { text-align: center; padding: 20px; display: none; }
+        /* Media query for mobile */
+        @media (max-width: 600px) { .item { padding: 10px; font-size: 14px; } }
+    </style>
+</head>
+<body>
+    <h1>ScrollSurf: Infinite Random Web Surfing</h1>
+    <div class="content-list" id="content-list"></div>
+    <div class="loading" id="loading">Loading more...</div>
+
+    <script>
+        const DATA_URL = 'https://raw.githubusercontent.com/shayholmes4/ScrollSurf/main/extension/data/sites.json';  // Replace YOUR_USERNAME; point to your scraped JSON
+        let allSites = [];
+        let currentIndex = 0;
+        const BATCH_SIZE = 10;  // Load 10 at a time for smooth scrolling
+
+        // Fetch and shuffle data
+        async function loadData() {
+            const response = await fetch(DATA_URL);
+            allSites = await response.json();
+            shuffleArray(allSites);  // Randomize for discovery feel
+            loadMore();  // Initial load
+        }
+
+        // Shuffle helper
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Load batch of items
+        function loadMore() {
+            const list = document.getElementById('content-list');
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            setTimeout(() => {  // Simulate load for fun feel
+                for (let i = 0; i < BATCH_SIZE && currentIndex < allSites.length; i++) {
+                    const site = allSites[currentIndex];
+                    const item = document.createElement('div');
+                    item.className = 'item';
+                    item.innerHTML = `<a href="${site.url}" target="_blank">${site.title || site.url}</a><p>${site.description || 'Explore this random gem!'}</p>`;
+                    // Optional: Add iframe preview (but limited by CORS; use if site allows)
+                    // item.innerHTML += `<iframe src="${site.url}" style="width:100%; height:300px; border:none;"></iframe>`;
+                    list.appendChild(item);
+                    currentIndex++;
+                }
+                loading.style.display = 'none';
+            }, 500);
+        }
+
+        // Infinite scroll detection
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                loadMore();
+            }
+        });
+
+        loadData();  // Start
+    </script>
+</body>
+</html>
