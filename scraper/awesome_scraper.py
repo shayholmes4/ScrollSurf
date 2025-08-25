@@ -8,7 +8,7 @@ import frontmatter
 
 SOURCE_NAME = "Awesome"
 START_URL = 'https://github.com/sindresorhus/awesome'
-source_list_path = '../extension/data/sources'
+source_list_path = '../extension/data/awesome.txt'
 source_list_file = "{}/{}".format(source_list_path, 'awesome.txt')
 
 pages_count = 0
