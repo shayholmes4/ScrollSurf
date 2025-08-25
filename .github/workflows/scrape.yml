@@ -29,6 +29,6 @@ jobs:
         run: |
           git config user.name "Automated Scraper"
           git config user.email "actions@github.com"
-          git add extension/data/  # Where scraper outputs (e.g., awesome.txt, sites.json)
+          git add extension/data/awesome.txt # Where scraper outputs (e.g., awesome.txt, sites.json)
           git commit -m "Auto-update scraped content: $(date -u)" || exit 0
           git push
