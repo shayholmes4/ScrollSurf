@@ -1,1 +1,2 @@
-
+Python Resources, https://github.com/vinta/awesome-python
+AI Tools, https://github.com/mlabonne/awesome-ai
