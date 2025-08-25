@@ -1,49 +1,82 @@
-<script>
-    const DATA_URL = 'https://raw.githubusercontent.com/shayholmes4/ScrollSurf/main/extension/data/awesome.txt';
-    let allSites = [];
-    let currentIndex = 0;
-    const BATCH_SIZE = 10;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScrollSurf - Random Web Discovery</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
+        h1 { text-align: center; padding: 20px; background: #007bff; color: white; margin: 0; }
+        .content-list { max-width: 800px; margin: 0 auto; padding: 10px; }
+        .item { background: white; margin: 10px 0; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); opacity: 0; animation: fadeIn 0.5s ease-in forwards; }
+        .item a { color: #007bff; text-decoration: none; font-weight: bold; }
+        .item a:hover { text-decoration: underline; Geological Modeling Resources, https://github.com/softwareunderground/awesome-open-geoscience }
+        .loading { text-align: center; padding: 20px; display: none; }
+        button { display: block; margin: 10px auto; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 600px) { .item { padding: 10px; font-size: 14px; } }
+    </style>
+</head>
+<body>
+    <h1>ScrollSurf: Infinite Random Web Surfing</h1>
+    <button onclick="window.open(allSites[Math.floor(Math.random() * allSites.length)].url, '_blank')">Surf Now!</button>
+    <div class="content-list" id="content-list"></div>
+    <div class="loading" id="loading">Loading more...</div>
 
-    async function loadData() {
-        const response = await fetch(DATA_URL);
-        const text = await response.text();
-        allSites = text.split('\n').filter(line => line.trim()).map(line => {
-            const [title, url] = line.split(',').map(s => s.trim());
-            return { title, url };
-        });
-        shuffleArray(allSites);
-        loadMore();
-    }
+    <script>
+        const DATA_URL = 'https://raw.githubusercontent.com/shayholmes4/ScrollSurf/main/extension/data/awesome.txt';
+        let allSites = [];
+        let currentIndex = 0;
+        const BATCH_SIZE = 10;
 
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    }
-
-    function loadMore() {
-        const list = document.getElementById('content-list');
-        const loading = document.getElementById('loading');
-        loading.style.display = 'block';
-        setTimeout(() => {
-            for (let i = 0; i < BATCH_SIZE && currentIndex < allSites.length; i++) {
-                const site = allSites[currentIndex];
-                const item = document.createElement('div');
-                item.className = 'item';
-                item.innerHTML = `<a href="${site.url}" target="_blank">${site.title || site.url}</a><p>Explore this random gem!</p>`;
-                list.appendChild(item);
-                currentIndex++;
+        async function loadData() {
+            try {
+                const response = await fetch(DATA_URL);
+                if (!response.ok) throw new Error('Failed to fetch data');
+                const text = await response.text();
+                allSites = text.split('\n').filter(line => line.trim()).map(line => {
+                    const [title, url] = line.split(',').map(s => s.trim());
+                    return { title, url };
+                });
+                shuffleArray(allSites);
+                loadMore();
+            } catch (error) {
+                console.error('Error loading data:', error);
             }
-            loading.style.display = 'none';
-        }, 500);
-    }
-
-    window.addEventListener('scroll', () => {
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-            loadMore();
         }
-    });
 
-    loadData();
-</script>
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function loadMore() {
+            const list = document.getElementById('content-list');
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            setTimeout(() => {
+                for (let i = 0; i < BATCH_SIZE && currentIndex < allSites.length; i++) {
+                    const site = allSites[currentIndex];
+                    const item = document.createElement('div');
+                    item.className = 'item';
+                    item.innerHTML = `<a href="${site.url}" target="_blank">${site.title || site.url}</a><p>Explore this random gem!</p>`;
+                    list.appendChild(item);
+                    currentIndex++;
+                }
+                loading.style.display = 'none';
+            }, 500);
+        }
+
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                loadMore();
+            }
+        });
+
+        loadData();
+    </script>
+</body>
+</html>
