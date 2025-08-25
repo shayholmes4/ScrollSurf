@@ -1,4 +1,6 @@
-name: Auto-Scrape Awesome Lists
+```yaml
+     ---
+     name: Auto-Scrape Awesome Lists
      on:
        schedule:
          - cron: '0 0 * * *'  # Runs daily at midnight UTC
@@ -41,3 +43,4 @@ name: Auto-Scrape Awesome Lists
                git add extension/data/awesome.txt || echo "No awesome.txt to add"
                git commit -m "Auto-update scraped content: $(date -u)" || echo "No changes to commit"
                git push
+     ```
