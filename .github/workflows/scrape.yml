@@ -2,8 +2,8 @@ name: Auto-Scrape Awesome Lists
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC; adjust as needed (e.g., '*/30 * * * *' for every 30 min)
-  workflow_dispatch:  # Allows manual trigger from GitHub UI
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual trigger
 
 jobs:
   scrape:
@@ -15,20 +15,20 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.9'  # Matches the scraper's needs
+          python-version: '3.9'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+          pip install scrapy frontmatter  # Required by awesome_scraper.py
 
       - name: Run scraper to update data
-        run: python awesome_scraper.py  # Assumes the scraper script is in the root; move if needed
+        run: python scraper/awesome_scraper.py  # Updated path to scraper/
 
       - name: Commit and push updated data
         run: |
           git config user.name "Automated Scraper"
           git config user.email "actions@github.com"
-          git add data/  # Or wherever the output JSON/files are saved (e.g., extension/data/sites.json)
-          git commit -m "Auto-update scraped content: $(date -u)" || exit 0  # Skips if no changes
+          git add extension/data/  # Where scraper saves output (e.g., awesome.txt, sites.json)
+          git commit -m "Auto-update scraped content: $(date -u)" || exit 0
           git push
