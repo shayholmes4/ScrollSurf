@@ -1,5 +1,4 @@
-```yaml
-     name: Auto-Scrape Awesome Lists
+name: Auto-Scrape Awesome Lists
      on:
        schedule:
          - cron: '0 0 * * *'  # Runs daily at midnight UTC
